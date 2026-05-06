@@ -1,0 +1,20 @@
+--track@tracking:文字間隔,-200,200,0
+--text@kern_values:カーニング値,
+
+-- manual_kerning.anm2
+-- 個別オブジェクトが有効かチェック
+if obj.num == 0 or obj.num == nil then
+    return
+end
+
+local cumulative = 0
+local line_num = 0
+
+for line in string.gmatch((kern_values or "") .. "\n", "([^\n]*)\n") do
+    line_num = line_num + 1
+    if line_num > obj.index then break end
+    line = string.gsub(line, "\r", "")
+    cumulative = cumulative + (tonumber(line) or 0)
+end
+
+obj.ox = obj.ox + cumulative + tracking * obj.index

@@ -1,0 +1,13 @@
+#:schema ./.aviutl2-cli/aviutl2.schema.json
+[project]
+id = "aviutl2-manual-kerning"
+name = "aviutl2-manual-kerning"
+version = "0.1.0"
+
+[development]
+aviutl2_version = "latest"
+
+[artifacts.script]
+destination = "Script/manual_kerning.anm2"
+source = "scripts/manual_kerning.anm2"
+placement_method = "copy"
