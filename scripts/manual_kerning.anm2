@@ -1,4 +1,5 @@
 --track@tracking:文字間隔,-200,200,0
+--separator:カーニング値 / n行目 = 文字nと文字n+1の間隔(px)
 --text@kern_values:カーニング値,
 
 -- manual_kerning.anm2
