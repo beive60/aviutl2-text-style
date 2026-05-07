@@ -1,9 +1,13 @@
-# aviutl2-manual-kerning
+# aviutl2-text-style
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-AviUtl2 のテキストオブジェクトにマニュアルカーニング（文字間隔）を設定する Lua アニメーション効果です。
-効果パネルの「カーニング値」欄に n 行目の数値を入力すると、テキストの n 文字目と n+1 文字目の間のカーニング値として適用されます。横書き・縦書きの両方に対応しています。
+AviUtl2 のテキストオブジェクトに文字単位のスタイル調整を適用する Lua アニメーション効果集です。タイトルテロップなどの文字組みに活用できます。
+
+提供するフィルタ：
+
+- **manual_kerning** — 文字間のカーニング値を 1 行ずつ指定（横書き・縦書き対応）
+- **manual_font_size** — 文字ごとのフォントサイズを % で指定（下辺揃え対応）
 
 ## 必要環境
 
@@ -13,18 +17,20 @@ AviUtl2 のテキストオブジェクトにマニュアルカーニング（文
 ## インストール
 
 [Releases](https://github.com/beive60/aviutl2-manual-kerning/releases) から
-最新の `manual_kerning.anm2` をダウンロードします。
+最新の `@manual_text_style.anm2` をダウンロードします。
 
-1. `manual_kerning.anm2` を AviUtl2 の Script フォルダにコピーする
+1. `@manual_text_style.anm2` を AviUtl2 の Script フォルダにコピーする
    - 既定パス: `C:\ProgramData\AviUtl2\Script\`
 2. AviUtl2 を再起動する
 
 ## 使い方
 
+### manual_kerning
+
 1. テキストオブジェクトにテキストを入力する
    例: `AviUtl`
 2. テキストオブジェクトの「個別オブジェクト」を有効にする
-3. アニメーション効果「manual_kerning」をそのテキストオブジェクトに追加する
+3. アニメーション効果「manual_kerning」または「manual_font_size」をそのテキストオブジェクトに追加する
 4. 縦書きテキストの場合は「縦書き」チェックボックスを有効にする
 5. 効果の「カーニング値」欄に、文字間ごとのカーニング値を **1 行ずつ** 入力する
 
@@ -47,6 +53,34 @@ AviUtl2 のテキストオブジェクトにマニュアルカーニング（文
 | 5行目 | t と l の間 | 0px |
 
 空行・数値以外の行は 0 として扱います。
+
+### manual_font_size
+
+1. テキストオブジェクトの「個別オブジェクト」を有効にする
+2. アニメーション効果「manual_font_size」をテキストオブジェクトに追加する
+3. 効果の「フォントサイズ」欄に、文字ごとのサイズを **% 単位で 1 行ずつ** 入力する
+
+例（`AviUtl` 6 文字の場合）:
+
+```
+100
+150
+80
+100
+100
+100
+```
+
+| 行 | 文字 | サイズ |
+|---|---|---|
+| 1行目 | A | 100%（等倍） |
+| 2行目 | v | 150% |
+| 3行目 | i | 80% |
+| 4行目 | U | 100%（等倍） |
+| 5行目 | t | 100%（等倍） |
+| 6行目 | l | 100%（等倍） |
+
+空行・数値以外の行は 100%（等倍）として扱います。サイズ変更した文字の下辺は、基準サイズの文字の下辺に揃えられます。
 
 ## カーニング値の計算方法
 
@@ -73,8 +107,8 @@ AviUtl2 のテキストオブジェクトにマニュアルカーニング（文
 ```
 aviutl2-manual-kerning/
 ├── scripts/
-│   └── manual_kerning.anm2     # Lua アニメーション効果（本体）
-├── aviutl2.toml                # au2 CLI 設定
+│   └── @manual_text_style.anm2  # Lua アニメーション効果（本体）
+├── aviutl2.toml                 # au2 CLI 設定
 └── docs/
     └── architecture.md
 ```

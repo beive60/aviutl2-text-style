@@ -8,6 +8,6 @@ version = "0.1.0"
 aviutl2_version = "latest"
 
 [artifacts.script]
-destination = "Script/manual_kerning.anm2"
-source = "scripts/manual_kerning.anm2"
+destination = "Script/@manual_text_style.anm2"
+source = "scripts/@manual_text_style.anm2"
 placement_method = "copy"
