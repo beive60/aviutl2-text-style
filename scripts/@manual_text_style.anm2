@@ -28,7 +28,7 @@ local function get_current_font_size()
         end
     end
 
-    return 0
+    return 1000
 end
 
 local function from_em_thousandths(value, font_size)
