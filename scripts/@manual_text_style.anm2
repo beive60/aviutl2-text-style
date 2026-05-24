@@ -11,7 +11,7 @@ if obj.num == 0 or obj.num == nil then
 end
 
 local function get_current_font_size()
-    -- AviUtl2 の公開プロパティ名が環境差分を持つ可能性があるため、候補を順に試す
+    -- スクリプト実行環境ごとに公開プロパティ名が異なる可能性があるため、候補を順に試す
     local font_size = tonumber(obj.fontsize)
         or tonumber(obj.font_size)
         or tonumber(obj.size)
@@ -29,12 +29,12 @@ local function get_current_font_size()
         end
     end
 
-    -- サイズ取得に失敗した場合は従来どおりの 1:1 挙動を維持する
+    -- サイズ取得に失敗した場合は従来どおり入力値をそのまま px として扱う
     return 1000
 end
 
 local function from_em_thousandths(value, font_size)
-    -- Adobe 系と同じ 1/1000 em を現在サイズに換算する
+    -- InDesign / Illustrator と同じ 1/1000 em を現在サイズに換算する
     return value / 1000 * font_size
 end
 
