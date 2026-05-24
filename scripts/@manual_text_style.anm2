@@ -13,7 +13,8 @@ end
 local EM_FALLBACK_FONT_SIZE = 1000
 
 local function get_current_font_size()
-    -- スクリプト実行環境ごとに公開プロパティ名が異なる可能性があるため、候補を順に試す
+    -- スクリプト実行環境ごとに公開プロパティ名が異なる可能性があるため、
+    -- まず候補名を順に試し、取れなければ obj.h * obj.zoom から現在サイズを推定する
     local font_size = tonumber(obj.fontsize)
         or tonumber(obj.font_size)
         or tonumber(obj.size)
@@ -31,17 +32,18 @@ local function get_current_font_size()
         end
     end
 
-    -- サイズ取得に失敗した場合は従来どおり入力値をそのまま px として扱う
+    -- サイズ取得に失敗した場合も数値互換を維持できるよう 1/1000 em 換算を実質 1:1 にする
     return EM_FALLBACK_FONT_SIZE
 end
 
-local function from_em_thousandths(value, font_size)
+local function from_em_thousandths(value, em_scale)
     -- InDesign / Illustrator と同じ 1/1000 em を現在サイズに換算する
-    return value / 1000 * font_size
+    return value * em_scale
 end
 
 local font_size = get_current_font_size()
-local tracking_offset = from_em_thousandths(tonumber(tracking) or 0, font_size)
+local em_scale = font_size / 1000
+local tracking_offset = from_em_thousandths(tonumber(tracking) or 0, em_scale)
 local cumulative = 0
 local line_num = 0
 
@@ -49,7 +51,7 @@ for line in string.gmatch((kern_values or "") .. "\n", "([^\n]*)\n") do
     line_num = line_num + 1
     if line_num > obj.index then break end
     line = string.gsub(line, "\r", "")
-    cumulative = cumulative + from_em_thousandths(tonumber(line) or 0, font_size)
+    cumulative = cumulative + from_em_thousandths(tonumber(line) or 0, em_scale)
 end
 
 if vertical then
