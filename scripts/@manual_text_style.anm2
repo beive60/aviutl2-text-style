@@ -15,7 +15,7 @@ local DEFAULT_EM_SCALE = 1
 
 local function get_current_font_size()
     -- スクリプト実行環境ごとに公開プロパティ名が異なる可能性があるため、
-    -- まず候補名を順に試し、取れなければ obj.h * obj.zoom から現在サイズを推定する
+    -- まず候補名を順に試し、取れなければ best-effort で obj.h * obj.zoom から現在サイズを推定する
     local font_size = tonumber(obj.fontsize)
         or tonumber(obj.font_size)
         or tonumber(obj.size)
@@ -38,7 +38,7 @@ end
 
 local font_size = get_current_font_size()
 -- InDesign / Illustrator と同じ 1/1000 em を現在サイズに換算する。
--- サイズ取得に失敗した場合は数値互換を優先して 1:1 のまま適用する。
+-- サイズ取得に失敗した場合は後方互換のため数値互換を優先して 1:1 のまま適用する。
 local em_scale = font_size ~= nil and (font_size / EM_DIVISOR) or DEFAULT_EM_SCALE
 local tracking_offset = (tonumber(tracking) or 0) * em_scale
 local cumulative = 0
