@@ -1,7 +1,7 @@
 @manual_kerning
---track@tracking:文字間隔,-200,200,0
+--track@tracking:トラッキング(1/1000 em),-200,200,0
 --check@vertical:縦書き,false
---separator:カーニング値 / n行目 = 文字nと文字n+1の間隔(px)
+--separator:カーニング値 / n行目 = 文字nと文字n+1の間隔(1/1000 em)
 --text@kern_values:カーニング値,
 
 -- manual_kerning.anm2
@@ -10,6 +10,33 @@ if obj.num == 0 or obj.num == nil then
     return
 end
 
+local function get_current_font_size()
+    local font_size = tonumber(obj.fontsize)
+        or tonumber(obj.font_size)
+        or tonumber(obj.size)
+
+    if font_size ~= nil and font_size > 0 then
+        return font_size
+    end
+
+    local height = tonumber(obj.h)
+    local zoom = tonumber(obj.zoom)
+    if height ~= nil and zoom ~= nil then
+        font_size = height * zoom
+        if font_size > 0 then
+            return font_size
+        end
+    end
+
+    return 0
+end
+
+local function from_em_thousandths(value, font_size)
+    return value / 1000 * font_size
+end
+
+local font_size = get_current_font_size()
+local tracking_offset = from_em_thousandths(tonumber(tracking) or 0, font_size)
 local cumulative = 0
 local line_num = 0
 
@@ -17,13 +44,13 @@ for line in string.gmatch((kern_values or "") .. "\n", "([^\n]*)\n") do
     line_num = line_num + 1
     if line_num > obj.index then break end
     line = string.gsub(line, "\r", "")
-    cumulative = cumulative + (tonumber(line) or 0)
+    cumulative = cumulative + from_em_thousandths(tonumber(line) or 0, font_size)
 end
 
 if vertical then
-    obj.oy = obj.oy + cumulative + tracking * obj.index
+    obj.oy = obj.oy + cumulative + tracking_offset * obj.index
 else
-    obj.ox = obj.ox + cumulative + tracking * obj.index
+    obj.ox = obj.ox + cumulative + tracking_offset * obj.index
 end
 
 @manual_font_size
