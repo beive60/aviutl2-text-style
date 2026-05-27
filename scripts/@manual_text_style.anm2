@@ -25,8 +25,8 @@ local function get_current_font_size()
     end
 
     local height = tonumber(obj.h)
-    local zoom = tonumber(obj.zoom)
-    if height ~= nil and zoom ~= nil then
+    local zoom = tonumber(obj.zoom) or 1
+    if height ~= nil then
         font_size = height * zoom
         if font_size > 0 then
             return font_size
