@@ -91,11 +91,11 @@ else
     progress = 1.0
 end
 
--- 色情報の分解 (0xBBGGRR -> R, G, B)
-local b = math.floor(color / 65536) % 256
-local g = math.floor(color / 256) % 256
-local r = color % 256
-local a = opacity / 100
+local red, green, blue = RGB(color)
+local alpha = 1 - (opacity / 100)
+local premul_red = (red / 255) * alpha
+local premul_green = (green / 255) * alpha
+local premul_blue = (blue / 255) * alpha
 
 -- 幾何演算
 local x0, y0, x1, y1, x2, y2, x3, y3
@@ -133,14 +133,15 @@ else
 end
 
 -- 乗算合成 (blend=3: Multiply) で蛍光ペン描画
+local vertices = {
+    { x0, y0, 0, premul_red, premul_green, premul_blue, alpha },
+    { x1, y1, 0, premul_red, premul_green, premul_blue, alpha },
+    { x2, y2, 0, premul_red, premul_green, premul_blue, alpha },
+    { x3, y3, 0, premul_red, premul_green, premul_blue, alpha },
+}
+
 obj.setoption("blend", 3)
-obj.drawpoly(
-    x0, y0, 0,
-    x1, y1, 0,
-    x2, y2, 0,
-    x3, y3, 0,
-    r, g, b, a
-)
+obj.drawpoly(vertices, 4)
 obj.setoption("blend", 0)
 
 -- テキスト本体を描画 (Z-Order整合性)
