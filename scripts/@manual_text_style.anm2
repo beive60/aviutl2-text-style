@@ -63,6 +63,9 @@ obj.oy = obj.oy + delta_oy
 
 -- highlighter_underline.anm2
 -- 個別オブジェクト無効化前提の統合描画
+if obj.num ~= 0 and obj.num ~= nil then
+    return
+end
 
 -- イージング関数 (easeInOutQuint): t=[0,1] -> [0,1]
 local function easeInOutQuint(t)
