@@ -53,7 +53,7 @@ obj.oy = obj.oy + delta_oy
 
 @highlighter_underline
 --track@thickness:太さ,1,100,8
---track@opacity:透明度,0,100,60
+--track@opacity:透明度(0=不透明,100=透明),0,100,60
 --track@margin:長さ調整,-200,200,0
 --track@offset:位置オフセット,-200,200,0
 --track@start_delay:開始遅延,0,10,0,0.01
