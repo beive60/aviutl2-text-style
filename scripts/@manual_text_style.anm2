@@ -59,7 +59,7 @@ obj.oy = obj.oy + delta_oy
 --track@start_delay:開始遅延,0,10,0,0.01
 --track@duration:描画時間,0.01,10,2,0.01
 --check@vertical:縦書き,false
---color@color:色,0xffff00
+--color@color:色,0x00ffff
 
 -- highlighter_underline.anm2
 -- 個別オブジェクト無効化前提の統合描画
