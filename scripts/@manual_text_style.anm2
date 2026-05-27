@@ -50,3 +50,98 @@ local s = size_pct / 100
 local delta_oy = obj.h * obj.zoom / 2 * (1 - s)
 obj.zoom = obj.zoom * s
 obj.oy = obj.oy + delta_oy
+
+@highlighter_underline
+--track@thickness:太さ,1,100,8
+--track@opacity:透明度,0,100,60
+--track@margin:長さ調整,-200,200,0
+--track@offset:位置オフセット,-200,200,0
+--track@start_delay:開始遅延,0,10,0,0.01
+--track@duration:描画時間,0.01,10,2,0.01
+--check@vertical:縦書き,false
+--color@color:色,0xffff00
+
+-- highlighter_underline.anm2
+-- 個別オブジェクト無効化前提の統合描画
+
+-- イージング関数 (easeInOutQuint): t=[0,1] -> [0,1]
+local function easeInOutQuint(t)
+    if t < 0.5 then
+        return 16 * t * t * t * t * t
+    else
+        local v = -2 * t + 2
+        return 1 - (v * v * v * v * v) / 2
+    end
+end
+
+-- タイムライン評価
+local time = obj.time
+local progress = 0.0
+
+if time < start_delay then
+    -- アニメーション開始前: テキストのみ描画
+    obj.draw()
+    return
+elseif time <= start_delay + duration then
+    -- アニメーション中: 進行度を算出
+    local t = (time - start_delay) / duration
+    progress = easeInOutQuint(t)
+else
+    -- アニメーション完了: 完全伸長
+    progress = 1.0
+end
+
+-- 色情報の分解 (0xBBGGRR -> R, G, B)
+local b = math.floor(color / 65536) % 256
+local g = math.floor(color / 256) % 256
+local r = color % 256
+local a = opacity / 100
+
+-- 幾何演算
+local x0, y0, x1, y1, x2, y2, x3, y3
+
+if vertical then
+    -- 縦書き: 上から下へ伸長
+    local H = obj.h + margin
+    local h_current = H * progress
+    local x_c = -obj.w / 2 + offset
+    local y_start = -obj.h / 2 - (margin / 2)
+
+    x0 = x_c - (thickness / 2)
+    y0 = y_start
+    x1 = x_c + (thickness / 2)
+    y1 = y_start
+    x2 = x1
+    y2 = y_start + h_current
+    x3 = x0
+    y3 = y2
+else
+    -- 横書き: 左から右へ伸長
+    local W = obj.w + margin
+    local w_current = W * progress
+    local y_c = obj.h / 2 + offset
+    local x_start = -obj.w / 2 - (margin / 2)
+
+    x0 = x_start
+    y0 = y_c - (thickness / 2)
+    x1 = x_start + w_current
+    y1 = y0
+    x2 = x1
+    y2 = y_c + (thickness / 2)
+    x3 = x0
+    y3 = y2
+end
+
+-- 乗算合成 (blend=3: Multiply) で蛍光ペン描画
+obj.setoption("blend", 3)
+obj.drawpoly(
+    x0, y0, 0,
+    x1, y1, 0,
+    x2, y2, 0,
+    x3, y3, 0,
+    r, g, b, a
+)
+obj.setoption("blend", 0)
+
+-- テキスト本体を描画 (Z-Order整合性)
+obj.draw()
