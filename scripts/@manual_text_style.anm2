@@ -1,8 +1,9 @@
 @manual_kerning
---track@tracking:文字間隔,-200,200,0
+--track@tracking:トラッキング(1/1000 em),-200,200,0
 --check@vertical:縦書き,false
---separator:カーニング値 / n行目 = 文字nと文字n+1の間隔(px)
+--separator:カーニング値 / n行目 = 文字nと文字n+1の間隔(1/1000 em)
 --text@kern_values:カーニング値,
+--separator:※ manual_font_size と併用する場合は manual_kerning を先に追加してください
 
 -- manual_kerning.anm2
 -- 個別オブジェクトが有効かチェック
@@ -10,6 +11,37 @@ if obj.num == 0 or obj.num == nil then
     return
 end
 
+local EM_DIVISOR = 1000
+local DEFAULT_EM_SCALE = 1
+
+local function get_current_font_size()
+    -- スクリプト実行環境ごとに公開プロパティ名が異なる可能性があるため、
+    -- まず候補名を順に試し、取れなければ best-effort で obj.h * obj.zoom から現在サイズを推定する
+    local font_size = tonumber(obj.fontsize)
+        or tonumber(obj.font_size)
+        or tonumber(obj.size)
+
+    if font_size ~= nil and font_size > 0 then
+        return font_size
+    end
+
+    local height = tonumber(obj.h)
+    local zoom = tonumber(obj.zoom) or 1
+    if height ~= nil then
+        font_size = height * zoom
+        if font_size > 0 then
+            return font_size
+        end
+    end
+
+    return nil
+end
+
+local font_size = get_current_font_size()
+-- InDesign / Illustrator と同じ 1/1000 em を現在サイズに換算する。
+-- サイズ取得に失敗した場合は後方互換のため数値互換を優先して 1:1 のまま適用する。
+local em_scale = font_size ~= nil and (font_size / EM_DIVISOR) or DEFAULT_EM_SCALE
+local tracking_offset = (tonumber(tracking) or 0) * em_scale
 local cumulative = 0
 local line_num = 0
 
@@ -17,13 +49,13 @@ for line in string.gmatch((kern_values or "") .. "\n", "([^\n]*)\n") do
     line_num = line_num + 1
     if line_num > obj.index then break end
     line = string.gsub(line, "\r", "")
-    cumulative = cumulative + (tonumber(line) or 0)
+    cumulative = cumulative + (tonumber(line) or 0) * em_scale
 end
 
 if vertical then
-    obj.oy = obj.oy + cumulative + tracking * obj.index
+    obj.oy = obj.oy + cumulative + tracking_offset * obj.index
 else
-    obj.ox = obj.ox + cumulative + tracking * obj.index
+    obj.ox = obj.ox + cumulative + tracking_offset * obj.index
 end
 
 @manual_font_size
