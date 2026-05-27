@@ -3,6 +3,7 @@
 --check@vertical:縦書き,false
 --separator:カーニング値 / n行目 = 文字nと文字n+1の間隔(1/1000 em)
 --text@kern_values:カーニング値,
+--separator:※ manual_font_size と併用する場合は manual_kerning を先に追加してください
 
 -- manual_kerning.anm2
 -- 個別オブジェクトが有効かチェック
